@@ -2,8 +2,13 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import { Route, useNavigate } from "react-router-dom";
+import { Routes } from 'react-router-dom';
+import Chat from "./components/Chat/Chat";
+
 
 function App() {
+	const navigate = useNavigate();
 	// const [count, setCount] = useState(0);
 	const [isStudent, setIsStudent] = useState(false);
 	const [isEnterprise, setIsEnterprise] = useState(false);
@@ -229,6 +234,10 @@ function App() {
 				Click on the Vite and React logos to learn more
 			</p>
       */}
+	  <Routes>
+		<Route path={'/Trends_app_MVP/chat'} element={<Chat />} />
+	  </Routes>
+	  <button onClick={() =>{navigate('/Trends_app_MVP/chat')}}>Ir al chat</button>
 		</>
 	);
 }
