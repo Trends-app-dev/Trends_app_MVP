@@ -8,7 +8,7 @@ const Home = () => {
   const location = useLocation();
   //console.log(location)
   return (
-    <div className='flex border-2 border-red-700 w-full h-[100vh] justify-center items-center'>
+    <div className='container-home flex border-2 border-red-700 w-full justify-center items-center'>
       {
         location.pathname === '/Trends_app_MVP' && <Register />
       }

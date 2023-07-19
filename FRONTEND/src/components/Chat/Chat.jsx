@@ -103,7 +103,7 @@ const Chat = () => {
 
   //  className=' border-2 border-black flex  w-full container-chat mt-[70px]'
   return (
-    <div className='flex border-2 border-indigo-600 '>
+    <div className='flex border-2 border-indigo-600 mt-[70px] '>
       {
         !isMinimized ? (
           <div className='container-chat flex items-center justify-start border-2 border-green-600 px-2'>
