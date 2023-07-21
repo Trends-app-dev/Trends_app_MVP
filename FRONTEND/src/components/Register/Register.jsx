@@ -6,20 +6,22 @@ import { useNavigate } from 'react-router-dom';
 const Register = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [auxUsername, setAuxUsername] = useState('');
   const userName = useSelector(state => state.userName);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = event => {
     const { value } = event.target;
-    dispatch(setUserName(value));
+    setAuxUsername(value)
   };
   const register = event => {
     event.preventDefault();
-    if(userName === '' ){
+    if(auxUsername === '' ){
       openModal();
       setMessage('Debe ingresar un Username')
     } else {
+      dispatch(setUserName(auxUsername));
       navigate('/Trends_app_MVP/chat');
     }
   };
