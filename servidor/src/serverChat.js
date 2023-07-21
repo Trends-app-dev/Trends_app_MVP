@@ -2,6 +2,8 @@ module.exports = serverSocket => {
   const { Server } = require('socket.io');
   const io = new Server(serverSocket, {cors:{origin:'*'}});
 
+
+
   // ===========================================================
   let onLineUsers = [];
   const addNewUser = (userName, socketId) => {
@@ -22,12 +24,12 @@ module.exports = serverSocket => {
   // --------------------------------------------------
   io.on('connection', socket => {
     // ===================================
-    socket.on("newUser", userName => {
-      addNewUser(userName, socket.id);
-    });
-    socket.on("disconnect", () =>{
-      removeUser(socket.id);
-    });
+    // socket.on("newUser", userName => {
+    //   addNewUser(userName, socket.id);
+    // });
+    // socket.on("disconnect", () =>{
+    //   removeUser(socket.id);
+    // });
     // ===================================
 
     // Ver en consola cuando se conecte un cliente
@@ -37,13 +39,32 @@ module.exports = serverSocket => {
     io.emit('saludo server', '!Hola...te saludo desde el servidor socket.io 👀');
 
     // Escuchando evento del cliente y enviando a todos
-    socket.on("message", ({ message, userName, fecha }) => {
-      console.log("Evento recibido: ", message, userName, fecha);
-      socket.broadcast.emit("message", {
-        message,
-        fecha,
-        from: userName,
-      });
+    socket.on("message", ({ message, userName, fecha, file }) => {
+      console.log("Evento recibido: ", message, userName, fecha, file);
+      console.log("archivo recibido: ", file);
+
+      if(file && file.data instanceof Buffer){
+        socket.broadcast.emit("message", {
+          message,
+          fecha,
+          from: userName,
+          file:{
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModifiedDate: file.lastModifiedDate,
+            lastModified: file.lastModified,
+            data: file.data
+          },
+        });
+      } else {
+        socket.broadcast.emit("message", {
+          message,
+          fecha,
+          from: userName,
+        });
+      }
     });
   });
 }
+

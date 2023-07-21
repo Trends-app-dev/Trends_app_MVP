@@ -1,7 +1,11 @@
 require('dotenv').config();
 const serverSocket = require('./src/server');
 const PORT = process.env.PORT || 3000;
+const { conn } = require('./src/db');
 
-serverSocket.listen(PORT, () => {
-  console.log(`Sever socket listening on ${PORT}`);
+
+conn.sync({force: true}).then(() => {
+  serverSocket.listen(PORT, () => {
+    console.log(`Sever socket listening on ${PORT}`);
+  });
 });
