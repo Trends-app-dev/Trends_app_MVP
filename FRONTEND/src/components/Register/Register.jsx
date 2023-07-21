@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserName } from '../../redux/action';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../Layout/Layout';
 
 const Register = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,10 +23,9 @@ const Register = () => {
       setMessage('Debe ingresar un Username')
     } else {
       dispatch(setUserName(auxUsername));
-      navigate('/Trends_app_MVP/chat');
     }
   };
-  
+
   const openModal = () => { setIsModalOpen(true) };
   const closeModal = () => {
     setIsModalOpen(false)
@@ -33,9 +33,9 @@ const Register = () => {
   };
 
   return (
-    <div className='flex h-full w-full justify-center items-center'>
+    <div className='flex h-[calc(100vh-80px)] w-full justify-center items-center'>
       <div className='flex h-56 w-96 flex-col bg-blue-400 justify-center items-center rounded-lg border-blue-950'>
-        <h1 className='flex text-lg font-semibold my-2 '>Registrate para entrar al Chat</h1>
+        <h1 className='flex text-lg font-semibold my-2 '>Ingresa un username para entrar al Chat</h1>
         <div className='flex flex-col w-4/5 justify-center items-center'>
           <h2 className='m-2'>Username</h2>
           <input

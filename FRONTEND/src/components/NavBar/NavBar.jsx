@@ -5,9 +5,9 @@ const NavBar = () => {
   const activeStyle = 'underline'
 
   return (
-    <nav className='flex justify-center items-center fixed w-[100%] py-5 px-8 text-sm font-light border-2 top-0 bg-blue-950 text-white'>
+    <nav className='flex justify-center items-center fixed w-[100%] h-[80px] py-5 px-8 text-sm font-light border-2 top-0 bg-blue-950 text-white'>
       <ul className='flex items-center gap-3'>
-        <li className='font-semibold text-lg'>
+        <li className='flex items-center font-semibold text-lg'>
           <NavLink
             to={'/Trends_app_MVP/inicio'}
             className={({isActive}) => isActive ? activeStyle: undefined }
@@ -15,12 +15,12 @@ const NavBar = () => {
             Inicio
           </NavLink>
         </li>
-        <li>
+        <li className='flex items-center text-sm' >
           <NavLink
-           // to={'/Trends_app_MVP/register'}
+            to={'/Trends_app_MVP'}
             className={({isActive}) => isActive ? activeStyle: undefined }
           >
-            otra pag
+            Home
           </NavLink>
         </li>
       </ul>

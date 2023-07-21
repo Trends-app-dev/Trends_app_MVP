@@ -2,7 +2,7 @@ import React from 'react'
 
 const Inicio = () => {
   return (
-    <div className='flex justify-center w-[100vh] h-[100vh]'>Inicio</div>
+    <div className='flex w-full h-full justify-center bg-slate-400'>Inicio</div>
   )
 }
 

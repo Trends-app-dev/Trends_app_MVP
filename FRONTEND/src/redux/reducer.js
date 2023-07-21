@@ -1,8 +1,9 @@
-import { USERNAME } from "./action-type";
+import { IS_MINIMIZED, USERNAME } from "./action-type";
 
 
 const initialState = {
   userName: '',
+  isMinimized: false,
 }
 
 const reducer = (state = initialState, action) => {
@@ -12,6 +13,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         userName: payload,
+      }
+    case IS_MINIMIZED:
+      return {
+        ...state,
+        isMinimized: payload,
       }
     default:
       return{

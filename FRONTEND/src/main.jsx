@@ -3,18 +3,18 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom';
-import Home from './components/Home/Home.jsx';
 import { Provider } from 'react-redux';
 import store from './redux/store.js';
+import App2 from './components/App2/App2.jsx';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <BrowserRouter>
       <React.StrictMode>
-        <Home />
+        <App2 />
         {/* <App /> */}
-      </React.StrictMode>,
+      </React.StrictMode>
     </BrowserRouter>
   </Provider>
 )
