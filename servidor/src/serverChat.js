@@ -33,21 +33,22 @@ module.exports = serverSocket => {
     // ===================================
 
     // Ver en consola cuando se conecte un cliente
-    console.log('Cliente conectado: ', socket.id);
+    //console.log('Cliente conectado: ', socket.id);
 
     // Emitiendo saludo a cada cliente que se conecte
     io.emit('saludo server', '!Hola...te saludo desde el servidor socket.io 👀');
 
     // Escuchando evento del cliente y enviando a todos
-    socket.on("message", ({ message, userName, fecha, file }) => {
-      console.log("Evento recibido: ", message, userName, fecha, file);
-      console.log("archivo recibido: ", file);
+    socket.on("message", ({ message, userName, image, fecha, file }) => {
+      //console.log("Evento recibido: ", message, userName, fecha, file);
+      //console.log("archivo recibido: ", file);
 
       if(file && file.data instanceof Buffer){
         socket.broadcast.emit("message", {
           message,
           fecha,
           from: userName,
+          image,
           file:{
             name: file.name,
             size: file.size,
@@ -62,6 +63,7 @@ module.exports = serverSocket => {
           message,
           fecha,
           from: userName,
+          image,
         });
       }
     });

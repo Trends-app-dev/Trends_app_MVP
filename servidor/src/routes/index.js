@@ -1,13 +1,11 @@
-const { Router } = require('express');
+const express = require('express');
+const usersRouter = require('./usersRouter');
 
-const router = Router();
+function routerApi(server) {
+  const router = express.Router();
+  //Ruta padre con versión
+  server.use("/api/v1", router);
+  router.use("/users", usersRouter);
+};
 
-router.get("/", (req, res) => {
-  res.json("Server socket listening...👀");
-});
-
-router.get('/register', (req, res) => {
-  res.send('Estas en register');
-});
-
-module.exports = router;
+module.exports = routerApi;
