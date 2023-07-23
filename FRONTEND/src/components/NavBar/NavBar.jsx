@@ -17,7 +17,7 @@ const NavBar = () => {
         </li>
         <li className='flex items-center text-sm' >
           <NavLink
-            to={'/Trends_app_MVP'}
+            to={'/Trends_app_MVP/home'}
             className={({isActive}) => isActive ? activeStyle: undefined }
           >
             Home

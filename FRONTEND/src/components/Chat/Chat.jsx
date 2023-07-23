@@ -1,13 +1,14 @@
 import React,  { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import io from 'socket.io-client';
-import { setIsMinimized, setUserName } from '../../redux/action';
+import { setImage, setIsLogin, setIsMinimized, setUserName } from '../../redux/action';
 import { useLocation, useNavigate } from 'react-router-dom';
 import adjuntarIcon from '../../assets/adjuntar.png';
 import enviarIcon from '../../assets/enviar.png';
 //import scrollbar from './scrollbar.css?inline';
 import scrollbar from './scrollbar.css';
-import Layout from '../Layout/Layout';
+import PDFPreview from '../PDFPreview/PDFPreview';
+// import FileViewer from 'react-file-viewer';
 
 const socket = io('http://localhost:3007');
 
@@ -21,6 +22,7 @@ const Chat = () => {
   const [saludoServer, setSaludoServer] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [pdfUrl, setPdfUrl] = useState(null);
   // const [isMinimized, setIsMinimized] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] =useState('');
@@ -29,7 +31,9 @@ const Chat = () => {
   // Estados Globales
   //------------------------------------------------------
   const userName = useSelector(state => state.userName);
+  const image = useSelector(state => state.image);
   const isMinimized = useSelector(state => state.isMinimized);
+  const isLogin = useSelector(state => state.isLogin);
 
   // Variables
   //-------------------------------------------------------
@@ -68,8 +72,8 @@ const Chat = () => {
       lastModified: selectedFile?.lastModified,
       data: selectedFile
     }
-    setMessages([...messages, {message, from: userName, fecha, file}]);
-    socket.emit("message", {message, userName, fecha, file});
+    setMessages([...messages, {message, from: userName, image, fecha, file}]);
+    socket.emit("message", {message, userName, image, fecha, file});
     setMessage("");
     setSelectedFile(null);
     setPreview(false);
@@ -79,9 +83,10 @@ const Chat = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if(message !== '' ){
+      console.log('fecha: ', new Date().getDay());
       const fecha = formatDate(new Date());
-      setMessages([...messages, {message, from: userName, fecha}]);
-      socket.emit("message", {message, userName, fecha});
+      setMessages([...messages, {message, from: userName, image, fecha}]);
+      socket.emit("message", {message, userName, image, fecha});
       setMessage("");
       setPreview(false);
     }
@@ -96,6 +101,7 @@ const Chat = () => {
       setPreview(true);
       // Crear una URL local temporal para la vista previa del archivo
       setFilePreview(URL.createObjectURL(file));
+      //window.open(URL.createObjectURL(file))
     }
   };
 
@@ -123,11 +129,19 @@ const Chat = () => {
     link.download = name;
     link.click();
   };
-
+  //!-----------------------------------------------------
+  const arrayBufferToUrl = (buffer, fileType) => {
+    const blob = new Blob([buffer], { type: fileType });
+    const url = URL.createObjectURL(blob)
+    console.log(url)
+    //window.open(url)
+    return url;
+  };
+  //!------------------------------------------------------
   // Formatear fecha
   const formatDate = (date) => {
     // Obtener el nombre del día de la semana
-    const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+    const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const nombreDiaSemana = diasSemana[date.getDay()];
     // Obtener la hora y los minutos
     const hora = date.getHours();
@@ -146,7 +160,10 @@ const Chat = () => {
   // Función para salir del Chat
   const exitChat = (event) => {
     event.preventDefault();
+    dispatch(setIsLogin(false));
     dispatch(setUserName(''));
+    dispatch(setImage('https://i.stack.imgur.com/4powQ.gif'));
+    setMessages([]);
   };
 
   // Función para convertir un ArrayBuffer a base64
@@ -157,6 +174,7 @@ const Chat = () => {
     for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
+    // console.log(window.btoa(binary));
     return window.btoa(binary);
   };
 
@@ -191,11 +209,12 @@ const Chat = () => {
 
   // Para Debugin
   useEffect(() => {
-    console.log('filePreviwe: ', filePreview);
-    console.log('selectedFile: ', selectedFile);
-    console.log('preview: ', preview)
+    //console.log('filePreviwe: ', filePreview);
+    //console.log('selectedFile: ', selectedFile);
+    //console.log('preview: ', preview)
     console.log('isMinimizeDefaul-false: ',isMinimized);
     console.log('userName: ',userName);
+    console.log('image: ', image);
   },[filePreview, selectedFile, preview, isMinimized,userName]);
 
   // Controlla el Scroll
@@ -204,16 +223,17 @@ const Chat = () => {
     const messageContainer = messagesRef.current;
     messageContainer && (messageContainer.scrollTop = messageContainer.scrollHeight);
     console.log('messages: ', messages);
-  },[messages])
+    //console.log(messages.map(item => item.file?.type))
+  },[messages, preview])
 
-  // Controlar cambio de página se minimize el chat
+  //Controlar cambio de página se minimize el chat
   // useEffect(() => {
   //   location.pathname !== '/Trends_app_MVP/chat'
   //     && dispatch(setIsMinimized(true));
   // },[location]);
 
   return (
-    <div className={`flex w-[100%] border-2 ${!userName && "hidden"}`}>
+    <div className={`flex w-[100%] border-2 ${!isLogin && "hidden"}`}>
       {
         !isMinimized ? (
           // *================================================
@@ -225,19 +245,20 @@ const Chat = () => {
               {/* ENCABEZADO IZQUIERDO (mi foto y username)*/}
               <div className='flex items-center left-[4px] top-[70] gap-3 bg-slate-400 w-[29.3%] h-[50px] fixed'>
                 <div className='flex w-7 h-7 ml-[5px] rounded-full bg-gray-500'>
-                  <img className='w-full h-full object-cover rounded-full' src='https://img.freepik.com/vector-premium/diseno-ilustracion-vector-personaje-estilo-anime-chica-joven-chica-anime-manga_147933-100.jpg?w=740' alt='' />
+                  <img className='w-full h-full object-cover rounded-full' src={`${image}`} alt='imagen de perfil' />
                 </div>
                 <h2 className='my-2'>{userName}</h2>
               </div>
             </div>
 
             {/* //* CONTENEDOR PRINCIPAL PANEL DERECHO */}
-            <div className='flex flex-col w-[70%] h-[calc(100vh-150px)] relative bottom-[36px] pb-[0px] border-2 border-slate-500'>
+            <div className='flex flex-col w-[70%] h-[calc(100vh-70px)] relative bottom-[36px] pb-[0px] border-2 border-slate-500 bg-white'>
               {/* ENCABEZADO DERECHO (foto y nombre del Chat actual, ya se grupal o individual) */}
               <div className='flex justify-between items-center pr-[15px] gap-1 bg-slate-500 w-[100%] h-[50px] '>
                 <div className='flex items-center  ml-[5px] gap-3'>
                   <div className='flex w-7 h-7 rounded-full bg-gray-500'>
-                    <img className='w-full h-full object-cover rounded-full' src='https://i.blogs.es/944446/naruto-el-anime-original-regresa-con-cuatro-nuevos-episodios-por-el-20-aniversario-de-la-serie11/1366_2000.jpeg' alt='' />
+                    {/* Foto del grupo o usuario al que se le envia mensajes */}
+                    <img className='w-full h-full object-cover rounded-full' src={'https://previews.123rf.com/images/thesomeday123/thesomeday1231712/thesomeday123171200009/91087331-icono-de-perfil-de-avatar-predeterminado-para-hombre-marcador-de-posici%C3%B3n-de-foto-gris-vector-de.jpg'} alt='foto de perfil' />
                   </div>
                   <h2 className='my-2'>CHAT GRUPAL{}</h2>
                 </div>
@@ -260,20 +281,20 @@ const Chat = () => {
                 className='text-white flex-col w-full h-full flex'
               >
                 {/* cuerpo del chat aca se renderizan todos los mensajes */}
-                <ul ref={messagesRef} className=' w-[100%] h-[100%] pl-[40px] pr-[10px] bg-white items-end flex flex-col overflow-y-auto custom-scrollbar'>
+                <ul ref={messagesRef} className={`w-[100%] h-[100%]  pl-[40px] pr-[10px] bg-white items-end flex-col overflow-y-auto custom-scrollbar ${window.innerHeight === 669 && "max-h-[83%]"} ${window.innerHeight === 983 && "max-h-[88.5%]"}`}>
                   {
                     messages.map((message, index) => (
                       // *CONTENEDOR PRINCIPAL DE CADA MENSAJE INDIVIDUAL
                       //*-------------------------------------------------
                       <li key={index}
                         className={` my-[2px] mx-[3px] p-1 table text-sm w-[auto] max-w-[60%] rounded-md
-                          ${message.from === userName ? "bg-blue-200 text-blue-900 ml-auto": "li-message mr-auto"}
+                          ${message.from === userName ? "bg-blue-200 text-blue-900 ml-auto": "li-message mr-auto rounded-tl-[0%]"}
                         `}>
                         {/* //*Contenedor para la imagen de perfil, userName, hora mensaje */}
                         <div className='flex items-center w-full gap-2 px-1 mt-0 mb-1'>
                           { /** validación mostrar foto de quien envia mensaje */
                             message.from !== userName && <div className='flex w-7 h-7 rounded-full bg-gray-500 relative right-[46px]'>
-                              <img className='w-full h-full object-cover rounded-full' src='https://img.freepik.com/vector-premium/diseno-ilustracion-vector-personaje-estilo-anime-chica-joven-chica-anime-manga_147933-100.jpg?w=740' alt='' />
+                              <img className='w-full h-full object-cover rounded-full' src={`${message.image}`} alt='foto de perfil' />
                             </div>
                           }
                           { /** Validación para mostrar userName de quien envia mensaje */
@@ -287,15 +308,20 @@ const Chat = () => {
                             className={`text-sm text-slate-500 flex relative ${message.from !== userName && "right-[37px]"}`}
                           >{message.fecha}</span>
                         </div>
+                        {/* <PDFPreview src={`data:${message.file.type};base64,${arrayBufferToBase64(message.file.data)}`} name={message.file.name}/> */}
                         { /** Validación si vienen archivo adjunto se renderize */
                           message.file?.data &&
                           (
                             <div className='flex flex-col justify-center items-center w-[100%] h-[30%]'>
-                              <img
-                                src={message.file && message.file.data instanceof ArrayBuffer ? `data:${message.file.type};base64,${arrayBufferToBase64(message.file.data)}`: filePreview}
-                                alt={message.file.name}
-                                className='flex w-[200px] object-scale-down'
-                              />
+                              {
+                                message.file.type === "application/pdf" && message.file.data instanceof ArrayBuffer ?
+                                  <PDFPreview src={arrayBufferToUrl(message.file?.data, message.file?.type)} name={message.file.name}/>:
+                                  <img
+                                    src={message.file && message.file.data instanceof ArrayBuffer ? `data:${message.file.type};base64,${arrayBufferToBase64(message.file.data)}`: filePreview}
+                                    alt={message.file.name}
+                                    className='flex w-[200px] object-scale-down'
+                                  />
+                              }
                               {/** descargar archivo adjunto */}
                               <button onClick={(event) => {downloadFile(event,message.file)}}
                               >Download</button>
@@ -319,9 +345,14 @@ const Chat = () => {
                             >x</button>
                           </div>
                           {/** previsualización de archivo adjunto */}
-                          <img src={filePreview}
-                            className='w-[100%] h-[80%] object-scale-down'
-                          />
+                          {/* <PDFPreview url={filePreview} name={selectedFile.name} /> */}
+                          {
+                            selectedFile && (selectedFile.type === "application/pdf") ?
+                                <PDFPreview url={filePreview} name={selectedFile.name} /> :
+                                <img src={filePreview}
+                                  className='w-[100%] h-[80%] object-scale-down'
+                                />
+                          }
                           {/** icono de enviar */}
                           <div className='flex justify-end w-[100%]'>
                             <button
@@ -338,6 +369,22 @@ const Chat = () => {
                 {/** //*CONTENEDOR DE INPUT PARA TIPEAR MENSAJE */}
                 {/** //*-------------------------------------------- */}
                 <div className={`flex w-[100%] justify-between h-[60px] mt-[10px] p-2 bg-gray-500 ${preview && "hidden"}`}>
+                  { // Validación
+                    !selectedFile &&
+                    (
+                      <label className='custom-file-upload flex justify-center mr-[4px]  items-center px-[4px] py-[2px] bg-blue-500 text-white rounded md cursor-pointer'>
+                        <input
+                          className='hidden'
+                          onKeyDown={handleKeyDow}
+                          ref={fileInputRef}
+                          type='file' onChange={handleFilechange}
+                        />
+                        <img src={adjuntarIcon} alt="adjuntar archivo"
+                          className='w-[30px] h-[60px] object-cover'
+                        />
+                      </label>
+                    )
+                  }
                   <input
                     type="text"
                     onChange={handleChange}
@@ -346,22 +393,6 @@ const Chat = () => {
                     placeholder='write your message' name='message' value={message}
                     className='border-2 border-zinc-500 p-2 w-full text-black rounded-lg'
                   />
-                  { // Validación
-                    !selectedFile &&
-                    (
-                      <label className='custom-file-upload flex justify-center items-center px-4 py-2 bg-blue-500 text-white rounded md cursor-pointer'>
-                        <input
-                          className='hidden'
-                          onKeyDown={handleKeyDow}
-                          ref={fileInputRef}
-                          type='file' onChange={handleFilechange}
-                        />
-                        <img src={adjuntarIcon} alt="adjuntar archivo"
-                          className='w-[60px] h-[60px] object-cover'
-                        />
-                      </label>
-                    )
-                  }
                   <button
                     onClick={handleSubmit}
                     type='button'
@@ -379,7 +410,7 @@ const Chat = () => {
           // *================================================
           // *             CHAT MINIMIZADO
           // *================================================
-          <div className='flex justify-around  fixed items-center border-2 border-blue-950 rounded-md bottom-10 right-10 w-32 h-10'>
+          <div className='flex justify-around  fixed items-center border-2 bg-white border-blue-950 rounded-md bottom-10 right-10 w-32 h-10'>
             <span className='font-bold'>Chat</span>
             <button
               onClick={toggleMinimize}

@@ -43,7 +43,7 @@
 .li-message::before{
   content: ''; /* Debe haber contenido para que funcione el pseudoelemento */
   position: absolute;
-  top: -2.3px; /* Ajusta la posición vertical del pico */
+  top: -2.2px; /* Ajusta la posición vertical del pico */
   left: -14px; /* Ajusta la posición horizontal del pico */
   width: 0;
   height: 0;
