@@ -25,7 +25,7 @@ const loginUser = async (email, password) => {
         token,
         refresh
       }
-      return {access: true, user: userData};
+      return {access: true, user: userDataWithoutPassword};
     }
   } else {
     const error = new Error('No te encuentras registrado o hay error en los datos');

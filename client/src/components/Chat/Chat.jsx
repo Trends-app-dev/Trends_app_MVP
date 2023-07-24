@@ -74,7 +74,7 @@ const Chat = () => {
       data: selectedFile
     }
     setMessages([...messages, {message, from: userName, image, fecha, file}]);
-    socket.emit("message", {user_id, message, userName, image, fecha, file});
+    socket.emit("message", {user_id:user.id, message, userName, image, fecha, file});
     setMessage("");
     setSelectedFile(null);
     setPreview(false);
@@ -86,8 +86,8 @@ const Chat = () => {
     if(message !== '' ){
       console.log('fecha: ', new Date().getDay());
       const fecha = formatDate(new Date());
-      setMessages([...messages, {message, from: userName, image, fecha}]);
-      socket.emit("message", {message, userName, image, fecha});
+      setMessages([...messages, {user_id:user.id, message, from: userName, image, fecha}]);
+      socket.emit("message", {user_id:user.id, message, userName, image, fecha});
       setMessage("");
       setPreview(false);
     }

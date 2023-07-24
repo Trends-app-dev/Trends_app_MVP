@@ -1,3 +1,5 @@
+const { postMessage } = require('./controllers');
+
 module.exports = serverSocket => {
   const { Server } = require('socket.io');
   const io = new Server(serverSocket, {cors:{origin:'*'}});
@@ -39,10 +41,11 @@ module.exports = serverSocket => {
     io.emit('saludo server', '!Hola...te saludo desde el servidor socket.io 👀');
 
     // Escuchando evento del cliente y enviando a todos
-    socket.on("message", ({ message, userName, image, fecha, file }) => {
-      //console.log("Evento recibido: ", message, userName, fecha, file);
+    socket.on("message", ({ user_id, message, userName, image, fecha, file }) => {
+      console.log("Evento recibido: ", user_id, message, userName, fecha, file);
       //console.log("archivo recibido: ", file);
 
+      postMessage(user_id, message)
       if(file && file.data instanceof Buffer){
         socket.broadcast.emit("message", {
           message,
@@ -58,6 +61,7 @@ module.exports = serverSocket => {
             data: file.data
           },
         });
+
       } else {
         socket.broadcast.emit("message", {
           message,
