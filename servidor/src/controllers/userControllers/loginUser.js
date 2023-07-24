@@ -1,5 +1,6 @@
 const { User } = require('../../../db');
 const bcrypt = require('bcryptjs');
+const { createAccesToken, createRefreshToken } = require('../../helpers/jwt');
 
 const loginUser = async (email, password) => {
   if(!email || !password){
@@ -18,7 +19,13 @@ const loginUser = async (email, password) => {
       userFound.session = true;
       await userFound.save();
       const { password, ...userDataWithoutPassword } = userFound.dataValues;
-      return {access: true, user: userDataWithoutPassword};
+      const token = createAccesToken(userDataWithoutPassword);
+      const refresh = createRefreshToken(userDataWithoutPassword);
+      const userData = {
+        token,
+        refresh
+      }
+      return {access: true, user: userData};
     }
   } else {
     const error = new Error('No te encuentras registrado o hay error en los datos');

@@ -31,6 +31,7 @@ const Chat = () => {
   // Estados Globales
   //------------------------------------------------------
   const userName = useSelector(state => state.userName);
+  const user = useSelector(state => state.user);
   const image = useSelector(state => state.image);
   const isMinimized = useSelector(state => state.isMinimized);
   const isLogin = useSelector(state => state.isLogin);
@@ -73,7 +74,7 @@ const Chat = () => {
       data: selectedFile
     }
     setMessages([...messages, {message, from: userName, image, fecha, file}]);
-    socket.emit("message", {message, userName, image, fecha, file});
+    socket.emit("message", {user_id, message, userName, image, fecha, file});
     setMessage("");
     setSelectedFile(null);
     setPreview(false);

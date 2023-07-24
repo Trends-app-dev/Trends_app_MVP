@@ -3,7 +3,7 @@ import image from '../../assets/rick-and-morty-trippy-parallel-universe-qvw8fevd
 
 const Inicio = () => {
   return (
-    <div className='flex w-full h-full justify-center'
+    <div className='flex w-full h-full justify-center bg-cover text-[50px] text-white'
     style={{backgroundImage:`url(${image})`}}
     >Inicio</div>
   )

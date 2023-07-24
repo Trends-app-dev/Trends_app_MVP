@@ -5,6 +5,8 @@ const path = require('path');
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT } = process.env;
 
 const UserModel = require('./src/models/User');
+const MessageModel = require('./src/models/Message');
+
 
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/trends`, {
   logging: false,
@@ -31,6 +33,11 @@ const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}
 
 
 UserModel(sequelize);
+MessageModel(sequelize);
+console.log(sequelize.models)
+const { User, Message } = sequelize.models;
+
+Message.belongsTo(User, { foreignKey: 'user_id', allowNull: false });
 
 module.exports = {
   ...sequelize.models,
